@@ -15,6 +15,7 @@ export interface IUser extends Document {
   age: number;
   comparePassword(password: string): Promise<boolean>;
   changedPasswordAfter(JWTTimestamp: number): boolean;
+  image: { secure_url: String, publicId: String },
 }
 const userSchema = new Schema<IUser>(
   {
@@ -28,6 +29,7 @@ const userSchema = new Schema<IUser>(
     role: { type: String, enum: ["user", "admin"], default: "user" },
     active: { type: Boolean, default: true },
     age: { type: Number },
+    image: { secure_url: { type: String , required: true}, publicId: {type:String  , required: true} },
   },
   { timestamps: true }
 );

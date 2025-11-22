@@ -113,7 +113,7 @@ export const refresh = catchError(async (req: Request, res: Response, next: Next
     console.log(existingUser);
     if (!existingUser) return next(new AppError("Refresh token is not valid", 403));
 
-    const token = generateToken(existingUser._id as string);
+    const token = generateToken(existingUser._id.toString());
     return res.status(200).json({ status: "success", token, data: { user: existingUser } });
   });
 });

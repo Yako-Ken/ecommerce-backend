@@ -1,23 +1,24 @@
-import express, { NextFunction, Request, Response } from "express";
-import helmet from "helmet";
-import morgan from "morgan";
-import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import { User } from "./models/userModel";
-import globalErrorHandler from "./controller/errorController";
-import { catchError } from "./utils/catchError";
-import AppError from "./utils/AppError";
-import { userRouter } from "./routes/userRouter";
-import { authRouter } from "./routes/authRouter";
-import  productRouter  from "./routes/productRouter";
-import  CategoryRouter   from "./routes/categoryRouter";
-import { uploadRouter } from "./routes/uploadRouter";
-import { VariantRouter } from "./routes/variantsRouter";
-
-const app = express();
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const helmet_1 = __importDefault(require("helmet"));
+const morgan_1 = __importDefault(require("morgan"));
+const express_mongo_sanitize_1 = __importDefault(require("express-mongo-sanitize"));
+const xss_clean_1 = __importDefault(require("xss-clean"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const cors_1 = __importDefault(require("cors"));
+const errorController_1 = __importDefault(require("./controller/errorController"));
+const AppError_1 = __importDefault(require("./utils/AppError"));
+const userRouter_1 = require("./routes/userRouter");
+const authRouter_1 = require("./routes/authRouter");
+const productRouter_1 = __importDefault(require("./routes/productRouter"));
+const categoryRouter_1 = __importDefault(require("./routes/categoryRouter"));
+const uploadRouter_1 = require("./routes/uploadRouter");
+const variantsRouter_1 = require("./routes/variantsRouter");
+const app = (0, express_1.default)();
 /**
  * Purpose: Sets up the web server to handle requests and responses.
  * Features:
@@ -26,10 +27,8 @@ const app = express();
  * Example:
  * - Handles an incoming `GET /` request and sends a response.
  */
-
 // Middleware Setup
-
-app.use(helmet());
+app.use((0, helmet_1.default)());
 /**
  * Middleware: helmet
  * Purpose: Enhances security by setting appropriate HTTP headers.
@@ -40,8 +39,7 @@ app.use(helmet());
  * Usage:
  * - Automatically secures your API with default settings.
  */
-
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use((0, morgan_1.default)(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 /**
  * Middleware: morgan
  * Purpose: Logs HTTP requests for debugging and monitoring purposes.
@@ -51,10 +49,8 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
  * Example:
  * - Logs: "GET /home 200 5.432 ms - 13"
  */
-
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ limit: "10mb", extended: true }));
-
+app.use(express_1.default.json({ limit: "10mb" }));
+app.use(express_1.default.urlencoded({ limit: "10mb", extended: true }));
 /**
  * Middleware: express.json()
  * Purpose: Parses incoming JSON payloads in requests.
@@ -64,8 +60,7 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
  * - Incoming request: `{ "name": "John" }`
  * - Accessible in code: `req.body.name === "John"`
  */
-
-app.use(express.urlencoded({ extended: false }));
+app.use(express_1.default.urlencoded({ extended: false }));
 /**
  * Middleware: express.urlencoded()
  * Purpose: Parses incoming URL-encoded payloads, such as form submissions.
@@ -76,8 +71,7 @@ app.use(express.urlencoded({ extended: false }));
  * - Incoming form: `<form><input name="name" value="John"></form>`
  * - Accessible in code: `req.body.name === "John"`
  */
-
-app.use(cookieParser());
+app.use((0, cookie_parser_1.default)());
 /**
  * Middleware: cookieParser
  * Purpose: Parses cookies from incoming requests.
@@ -87,8 +81,7 @@ app.use(cookieParser());
  * - Incoming header: `Cookie: userId=12345`
  * - Accessible in code: `req.cookies.userId === "12345"`
  */
-
-app.use(mongoSanitize());
+app.use((0, express_mongo_sanitize_1.default)());
 /**{
   "username": { "$gt": "" },
   "password": "anyPassword"
@@ -103,8 +96,7 @@ This matches any user in the database because $gt bypasses the need for a specif
  * - Malicious input: `{ "$gt": "" }`
  * - Sanitized output: `{ }`
  */
-
-app.use(xss());
+app.use((0, xss_clean_1.default)());
 /**
  * Middleware: xss-clean
  * Purpose: Protects against Cross-Site Scripting (XSS) attacks.
@@ -114,8 +106,7 @@ app.use(xss());
  * - Malicious input: `<script>alert('Hacked!')</script>`
  * - Sanitized output: `alert('Hacked!')`
  */
-
-app.use(cors({ credentials: true, origin: true }));
+app.use((0, cors_1.default)({ credentials: true, origin: true }));
 /**
  * Middleware: cors
  * Purpose: Enables Cross-Origin Resource Sharing (CORS).
@@ -127,10 +118,9 @@ app.use(cors({ credentials: true, origin: true }));
  * Example:
  * - Frontend hosted on `http://example.com` can access API on `http://api.example.com`.
  */
-
 app.use((req, res, next) => {
-  console.log(req.url);
-  next();
+    console.log(req.url);
+    next();
 });
 /**
  * Middleware: Request Logger
@@ -139,15 +129,14 @@ app.use((req, res, next) => {
  * - Request: `GET /home`
  * - Logs: `/home`
  */
-
-app.use("/auth", authRouter);
-app.use("/user", userRouter);
-app.use("/products", productRouter);
-app.use("/categories", CategoryRouter); // ✅ تم التغيير إلى صيغة الجمع
-app.use("/upload", uploadRouter);
-app.use("/variants", VariantRouter);
-app.all("*", (req: Request, res: Response, next: NextFunction) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+app.use("/auth", authRouter_1.authRouter);
+app.use("/user", userRouter_1.userRouter);
+app.use("/products", productRouter_1.default);
+app.use("/categories", categoryRouter_1.default); // ✅ تم التغيير إلى صيغة الجمع
+app.use("/upload", uploadRouter_1.uploadRouter);
+app.use("/variants", variantsRouter_1.VariantRouter);
+app.all("*", (req, res, next) => {
+    next(new AppError_1.default(`Can't find ${req.originalUrl} on this server`, 404));
 });
 /**
  * Middleware: Catch-All Route Handler
@@ -160,17 +149,14 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
  * - Logs: `/unknown`
  * - Response: `{ "message": "Can't find /unknown on this server", "status": 404 }`
  */
-
 /*
-When an error occurs in the application, 
+When an error occurs in the application,
 Express.js will automatically call the next middleware function in the chain that has four arguments.
-Note that this middleware will only catch errors that occur in the application after it's been added to the middleware chain. 
+Note that this middleware will only catch errors that occur in the application after it's been added to the middleware chain.
 If an error occurs before this middleware is added, it will not be caught by this middleware.
 */
-
-app.use(globalErrorHandler);
-export default app;
-
+app.use(errorController_1.default);
+exports.default = app;
 /**
  * Error Handling Middleware
  * Note:
