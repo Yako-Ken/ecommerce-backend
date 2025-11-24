@@ -14,6 +14,7 @@ import productRouter from "./routes/productRouter";
 import CategoryRouter from "./routes/categoryRouter";
 import { uploadRouter } from "./routes/uploadRouter";
 import { VariantRouter } from "./routes/variantsRouter";
+import { OrderRouter } from "./routes/orderRouter";
 
 const app = express();
 
@@ -37,7 +38,7 @@ app.use("/products", productRouter);
 app.use("/categories", CategoryRouter);
 app.use("/upload", uploadRouter);
 app.use("/variants", VariantRouter);
-
+app.use("/orders", OrderRouter);
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
