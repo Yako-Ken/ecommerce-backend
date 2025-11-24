@@ -1,4 +1,4 @@
-import { Order } from "../models";
+import { Order } from "../models/Order";
 import { createEntitiy, deleteEntitiy, getAllEntitiy, getEntitiy, updateEntitiy } from "./factoryController";
 
 export const createOrder = createEntitiy(Order);
