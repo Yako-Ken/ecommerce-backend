@@ -25,7 +25,7 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(xss());
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: "*" }));
 
 app.use((req, res, next) => {
   console.log(req.url);
