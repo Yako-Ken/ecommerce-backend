@@ -59,6 +59,7 @@ app.use("/upload", uploadRouter);
 app.use("/variants", VariantRouter);
 app.use("/orders", OrderRouter);
 
+
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
